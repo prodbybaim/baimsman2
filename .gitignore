@@ -1,4 +1,6 @@
-server/article/
-server/article.db
+# venv
 .venv
 venv
+
+# user's workspace
+*.code-workspace
