@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{% block title %}SMAN 2 Cikpus{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+  <header class="site-header">
+    <div>
+      <a class="brand" href="{{ url_for('home') }}">
+        <h2>SMAN 2 Cikarang Pusat</h2>
+      </a>
+      <form class="search" action="{{ url_for('home') }}" method="get">
+        <input name="q" placeholder="search" value="{{ q|default('') }}">
+        <button>Search</button>
+      </form>
+    </div>
+    <hr>
+  </header>
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="site-footer">
+    <hr>
+    <h3>&copy; SMAN 2 Cikarang Pusat</h3>
+    <p style="color: red;">Unreleased App, Published for feedback.</p>
+    <p>Developed by <a href="https://github.com/hirakamu" target="_blank">Hirakamu</a></p>
+  </footer>
+  <!-- script src="{{ url_for('static', filename='js/app.js') }}"></script-->
+</body>
+
+</html>

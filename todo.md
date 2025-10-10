@@ -1,0 +1,78 @@
+# Todo list
+
+Collection of to-do before releasing the website
+
+- [ ] Removing one-time-call JS function and put into each HTML file
+- [ ] Adding page creation as HTML
+- [ ] Merge the html with the server (previously served as static html) and make it more practical
+- [ ] expanding the app to serve more features
+    - [ ] Page creation
+    - [ ] Admin panel
+    - [ ] Receive CLI in API endpoint
+    - [ ] Notification system
+    - [ ] Email notifications
+    - [ ] In-app notifications
+- [ ] User authentication
+    - [ ] Login/Logout functionality
+    - [ ] Role-based access control
+- [ ] Database integration
+    - [ ] Set up database schema
+    - [ ] Implement data models
+- [ ] Testing and debugging
+    - [ ] Unit tests
+    - [ ] Integration tests
+- [ ] Documentation
+    - [ ] API documentation
+    - [ ] User guides
+    - [ ] Deployment
+    - [ ] CI/CD pipeline
+    - [ ] Server configuration
+    - [ ] Monitoring and logging
+    - [ ] Performance optimization
+    - [ ] Caching strategies
+    - [ ] Load balancing
+    - [ ] Database query optimization
+- [ ] Security enhancements
+    - [ ] Input validation
+    - [ ] Sanitization
+    - [ ] Rate limiting
+    - [ ] Security headers
+    - [ ] CORS policy configuration
+    - [ ] Content security policy (CSP)
+    - [ ] XSS protection
+    - [ ] CSRF protection
+    - [ ] SSL/TLS configuration
+- [ ] Regular security audits
+- [ ] Backup and disaster recovery
+    - [ ] Automated backups
+    - [ ] Recovery procedures
+- [ ] Performance monitoring
+    - [ ] Response time tracking
+    - [ ] Error rate monitoring
+- [ ] User feedback system
+    - [ ] Feedback collection
+    - [ ] Issue tracking
+- [ ] Mobile responsiveness
+    - [ ] Responsive design implementation
+    - [ ] Mobile-specific features
+- [ ] Push notifications for mobile users
+- [ ] Offline support
+- [ ] Progressive Web App (PWA) features
+- [ ] Accessibility improvements
+    - [ ] WCAG compliance
+    - [ ] Screen reader support
+    - [ ] Keyboard navigation
+- [ ] SEO optimization
+    - [ ] Meta tags
+    - [ ] Sitemap generation
+    - [ ] Analytics integration
+    - [ ] Google Analytics
+    - [ ] Custom event tracking
+- [ ] Legal compliance
+    - [ ] Privacy policy
+    - [ ] Terms of service
+    - [ ] Cookie consent banner
+- [ ] Marketing and outreach
+    - [ ] Social media integration
+    - [ ] Email marketing setup
+    - [ ] Content management system (CMS)
