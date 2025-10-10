@@ -1,1 +1,1 @@
-```git clone https://github.com/Hirakamu/smandacikpus```
+`git clone https://github.com/Hirakamu/smandacikpus`
