@@ -1,10 +1,13 @@
-import random, time, uuid, os, requests, yaml
+import random, uuid, os, requests, yaml
 from datetime import datetime, timedelta
 
+totaldata = 0
 for i in range(5):
     # API URL
-    url = "https://fakerapi.it/api/v2/texts?_quantity="+str(random.randint(1,20))+"&_characters=2048"
-    base_dir = "articles"
+    count = str(random.randint(1,20))
+    url = "https://fakerapi.it/api/v2/texts?_quantity="+count+"&_characters=2048"
+    base_dir = "/var/lib/smandacikpus/page/content"
+    totaldata = totaldata + int(count)
 
     # Fetch
     res = requests.get(url)
@@ -26,8 +29,13 @@ for i in range(5):
         rand_dt = random_datetime(start_date, end_date)
 
         # Folder path from random datetime
-        folder_path = os.path.join(base_dir, str(rand_dt.year), f"{rand_dt.month:02}", f"{rand_dt.day:02}")
-        os.makedirs(folder_path, exist_ok=True)
+        try:
+            folder_path = os.path.join(base_dir, str(rand_dt.year), f"{rand_dt.month:02}", f"{rand_dt.day:02}")
+            os.makedirs(folder_path, exist_ok=True)
+        except PermissionError as e:
+            print(f"Permission error: {e}")
+            exit()
+
 
         # Generate UUID5 using title + timestamp
         file_uuid = str(uuid.uuid5(NAMESPACE, entry['title'] + str(rand_dt.timestamp())))
@@ -45,4 +53,6 @@ for i in range(5):
         with open(filepath, "w", encoding="utf-8") as f:
             f.write(md_content)
 
-    print(f"| {len(data)} Scrapped.")
+    print(f"| {len(data)}")
+
+print(f"\n| {totaldata} Scrapped")

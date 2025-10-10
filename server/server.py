@@ -6,9 +6,9 @@ from pathlib import Path
 from flask import Flask, g, render_template, request, jsonify, abort
 
 ROOT = Path(__file__).parent
-USERDATA = Path("/var/lib/sman2cikpus")
+USERDATA = Path("/var/lib/smandacikpus/")
 DB_FILE = USERDATA / "articles.db"
-PAGEDIR = USERDATA / "articles"
+PAGEDIR = USERDATA / "page/content"
 PAGESHOW = 10
 PAGEPREVIEW = 200
 
@@ -324,6 +324,6 @@ def read(slug):
 if __name__ == "__main__":
     # always reindex on startup (force=True)
     with app.app_context():
-        inserted = importArticles(force=True)
+        inserted = importArticles()
         print(f"Indexed articles: {inserted}")
     app.run(host="0.0.0.0", port=5000, debug=True)
