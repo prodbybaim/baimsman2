@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Control Panel | SMAN 2 Cikpus{% endblock %}
+{% block content %}
+<h2>Welcome {{ user.username }}</h2>
+<p>Role: {{ user.role }}</p>
+
+<nav>
+  <a href="{{ url_for('panel') }}">Dashboard</a> |
+  <a href="{{ url_for('logout') }}">Logout</a>
+</nav>
+
+<section>
+  <h3>Articles Management</h3>
+  <p>You can list, edit, or delete articles here.</p>
+  <!-- Add your article management UI or JS later -->
+</section>
+{% endblock %}
