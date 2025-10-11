@@ -1,13 +1,16 @@
 # server.py
-import re, sqlite3, hashlib, markdown
+import re, sqlite3, hashlib, markdown, os, hashlib, datetime
+from werkzeug.security import generate_password_hash, check_password_hash
 from functools import lru_cache
 from datetime import datetime, timezone
 from pathlib import Path
-from flask import Flask, g, render_template, request, jsonify, abort
+from flask import Flask, g, render_template, request, jsonify, abort, session, redirect, url_for
+
 
 ROOT = Path(__file__).parent
 USERDATA = Path("/var/lib/smandacikpus/")
 DB_FILE = USERDATA / "articles.db"
+DB_AUTH_FILE = USERDATA / "auth.db"
 PAGEDIR = USERDATA / "page/content"
 PAGESHOW = 10
 PAGEPREVIEW = 200
@@ -15,49 +18,51 @@ PAGEPREVIEW = 200
 app = Flask(__name__, static_folder=str(ROOT / "static"), template_folder=str(ROOT / "templates"))
 app.config["JSON_SORT_KEYS"] = False
 
-class DB:
-    def __init__(self, dbFile):
-        self.dbFile = str(dbFile)
-
-    def connect(self):
-        if not hasattr(g, "_db") or g._db is None:
+class DB: 
+    def __init__(self, dbFile): 
+        self.dbFile = str(dbFile) 
+        
+    def connect(self): 
+        if not hasattr(g, "_db") or g._db is None: 
             g._db = sqlite3.connect(self.dbFile)
             g._db.row_factory = sqlite3.Row
         return g._db
-
-    def close(self, exception=None):
-        db = getattr(g, "_db", None)
+        
+    def close(self, exception=None): 
+        db = getattr(g, "_db", None) 
         if db is not None:
             db.close()
-            g._db = None
-
-    def initSchema(self):
-        db = self.connect()
-        db.execute("""
-            CREATE TABLE IF NOT EXISTS articles (
-                id INTEGER PRIMARY KEY,
-                slug TEXT UNIQUE,
-                title TEXT,
-                content TEXT,
-                created TEXT
-            )
-        """)
-        db.execute("CREATE INDEX IF NOT EXISTS idx_articles_slug ON articles(slug)")
-        db.commit()
+            g._db = None 
     
+    def initDB(self, script=None):
+        if not script:
+            print("No SQL script provided")
+            return
+        db = self.connect()
+        db.executescript(script)
+        db.commit()
+        
     def reset(self):
-        if Path(self.dbFile).exists():
-            Path(self.dbFile).unlink()  # delete DB file
-        # clear any lingering connection in g
-        if hasattr(g, "_db"):
-            g._db = None
-        self.initSchema()
+        db = self.connect()
+        cur = db.cursor()
+        cur.execute("""
+            SELECT type, name FROM sqlite_master
+            WHERE name NOT LIKE 'sqlite_%'
+        """)
+        for obj in cur.fetchall():
+            objType = obj["type"].upper()
+            objName = obj["name"]
+            cur.execute(f"DROP {objType} IF EXISTS {objName}")
+        db.commit()
 
-DBase = DB(DB_FILE)
+    
+DBPages = DB(DB_FILE)
+DBAuth = DB(DB_AUTH_FILE)
+
 
 @app.teardown_appcontext
 def close_db(exception=None):
-    DBase.close(exception)
+    DBPages.close(exception)
 
 def slugify(s: str) -> str:
     s = s.lower()
@@ -119,8 +124,8 @@ def _sha256(s: str) -> str:
     return hashlib.sha256(s.encode("utf-8")).hexdigest()
 
 def importArticles(force=False):
-    DBase.initSchema()
-    db = DBase.connect()
+    DBPages.initDB("""CREATE TABLE IF NOT EXISTS articles (id INTEGER PRIMARY KEY,slug TEXT UNIQUE,title TEXT,content TEXT,created TEXT);CREATE INDEX IF NOT EXISTS idx_articles_slug ON articles(slug);""")
+    db = DBPages.connect()
     verfyColumn(db)  # adds uuid, content_hash, mtime, last_indexed if missing
 
     allowed = {".md", ".markdown", ".txt", ".json"}
@@ -233,7 +238,7 @@ def importArticles(force=False):
 # Caching
 @lru_cache(maxsize=512)
 def articleSlug(slug: str):
-    db = DBase.connect()
+    db = DBPages.connect()
     row = db.execute("SELECT * FROM articles WHERE slug = ?", (slug,)).fetchone()
     if not row:
         return None
@@ -249,7 +254,7 @@ def articleSlug(slug: str):
 
 @lru_cache(maxsize=128)
 def articlePage(page: int, q: str = ""):
-    db = DBase.connect()
+    db = DBPages.connect()
     offset = (page - 1) * PAGESHOW
     if q:
         qterm = f"%{q}%"
@@ -287,7 +292,12 @@ def importPage():
 @app.route("/admin/reset")
 def resetPage():
     force = str(request.args.get("force", "")).lower() in ("1", "true", "yes")
-    DBase.reset()
+    DBPages.reset()
+    try:
+        articleSlug.cache_clear()
+        articlePage.cache_clear()
+    except Exception as e:
+        print(f"Cache clear failed: {e}")
     inserted = importArticles(force=force)
     return jsonify({"inserted": inserted, "force": force})
 
@@ -320,6 +330,56 @@ def read(slug):
     return render_template("article.html", article=art)
 
 # static files served automatically by Flask via app.static_folder
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@app.errorhandler(404)
+def not_found(e):
+    return render_template("error.html", code=404, message="Page Not Found"), 404
+
+@app.errorhandler(401)
+def unauthorized(e):
+    return render_template("error.html", code=401, message="Unauthorized Access"), 401
+
+@app.errorhandler(400)
+def bad_request(e):
+    return render_template("error.html", code=400, message="Bad Request"), 400
+
+@app.errorhandler(500)
+def server_error(e):
+    return render_template("error.html", code=500, message="Internal Server Error"), 500
+
+@app.errorhandler(Exception)
+def handle_any(e):
+    code = getattr(e, "code", 500)
+    msg = str(e) or "Unexpected Error"
+    return render_template("error.html", code=code, message=msg), code
+
+
 
 if __name__ == "__main__":
     # always reindex on startup (force=True)
