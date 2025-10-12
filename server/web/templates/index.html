@@ -1,81 +1,117 @@
 {% extends "base.html" %}
+
 {% block title %}Home - SMAN 2 Cikpus{% endblock %}
 
 {% block content %}
 
-<!-- Top carousel (uses latest 3 articles when available) -->
-<section id="hero-carousel" class="mb-4">
-  <div id="mainCarousel" class="carousel slide" data-bs-ride="carousel">
-    <div class="carousel-inner">
+<!-- Hero / Intro -->
+<section class="hero mb-4">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-7">
+        <h1 class="mb-2">Welcome to SMAN 2 Cikarang Pusat</h1>
+        <p class="lead">A place of learning, growth, and community. Explore our programs, achievements, and latest news.</p>
+        <p class="mt-3">
+          <a href="#about" class="btn btn-primary me-2">About Us</a>
+          <a href="#programs" class="btn btn-outline-secondary">Our Programs</a>
+        </p>
+      </div>
+      <div class="col-md-5 d-none d-md-block text-center">
+        <img src="{{ url_for('static', filename='images/school-illustration.svg') }}" alt="School" style="max-width:260px;">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- About -->
+<section id="about" class="py-4 mb-4 bg-white">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-8">
+        <h3>About SMAN 2 Cikarang Pusat</h3>
+        <p class="text-muted">SMAN 2 Cikpus is committed to academic excellence, character building, and preparing students for the future. Our teachers, staff, and students work together to create a safe, inclusive, and stimulating learning environment.</p>
+      </div>
+      <div class="col-md-4">
+        <h5>Quick facts</h5>
+        <ul class="small-muted">
+          <li>Established: 1998</li>
+          <li>Students: ~1,200</li>
+          <li>Accreditation: A</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Programs / Features -->
+<section id="programs" class="py-4 mb-4">
+  <div class="container">
+    <h3 class="mb-3">Our Programs</h3>
+    <div class="row g-3">
+      <div class="col-md-4">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h5>Science &amp; Math</h5>
+            <p class="small-muted">Strong STEM curriculum with labs and competitions.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h5>Arts &amp; Culture</h5>
+            <p class="small-muted">Music, visual arts, and traditional cultural activities.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h5>Sports &amp; Clubs</h5>
+            <p class="small-muted">Active student clubs and competitive sports teams.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Showcase / Latest News -->
+<section id="showcase" class="py-4 mb-4 bg-white">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h3 class="mb-0">Latest News</h3>
+      <small class="text-muted">Page {{ page }}</small>
+    </div>
+
+    <div class="row g-3">
       {% if articles and articles|length > 0 %}
-        {% for a in articles[:3] %}
-        <div class="carousel-item {% if loop.first %}active{% endif %}">
-          <div class="d-flex align-items-center" style="min-height:260px;background:linear-gradient(90deg, rgba(11,92,168,0.06), rgba(11,92,168,0.02));">
-            <div class="container">
-              <div class="row">
-                <div class="col-md-8">
-                  <h2 class="carousel-title"><a href="{{ url_for('site.read', slug=a.slug) }}">{{ a.title }}</a></h2>
-                  <p class="text-muted">{{ a.created }} — {{ a.snippet }}</p>
-                </div>
-                <div class="col-md-4 text-md-end d-none d-md-block">
-                  <a class="btn btn-primary" href="{{ url_for('site.read', slug=a.slug) }}">Read Article</a>
-                </div>
-              </div>
+        {% for a in articles %}
+        <div class="col-md-6">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title"><a href="{{ url_for('site.read', slug=a.slug) }}">{{ a.title }}</a></h5>
+              <p class="meta">Published: {{ a.created }}</p>
+              <p class="card-text">{{ a.snippet }}</p>
+              <a href="{{ url_for('site.read', slug=a.slug) }}" class="btn btn-sm btn-primary">Read more</a>
             </div>
           </div>
         </div>
         {% endfor %}
       {% else %}
-        <div class="carousel-item active">
-          <div class="d-flex align-items-center" style="min-height:260px;background:linear-gradient(90deg, rgba(11,92,168,0.06), rgba(11,92,168,0.02));">
-            <div class="container">
-              <div class="row">
-                <div class="col-md-8">
-                  <h2 class="carousel-title">Welcome to SMAN 2 Cikarang Pusat</h2>
-                  <p class="text-muted">Official school news, events, and student highlights.</p>
-                </div>
-                <div class="col-md-4 text-md-end d-none d-md-block">
-                  <a class="btn btn-primary" href="{{ url_for('site.contact') }}">Contact</a>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div class="col-12">
+          <p class="text-muted">No news yet. Check back later or contact the school to submit items.</p>
         </div>
       {% endif %}
     </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="#mainCarousel" data-bs-slide="prev">
-      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-      <span class="visually-hidden">Previous</span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#mainCarousel" data-bs-slide="next">
-      <span class="carousel-control-next-icon" aria-hidden="true"></span>
-      <span class="visually-hidden">Next</span>
-    </button>
-  </div>
-</section>
 
-<!-- Features / Highlights -->
-<section id="features" class="mb-5">
-  <div class="container">
-    <div class="row text-center mb-4">
-      <div class="col-md-4">
-        <div class="feature">
-          <h4>Quality Education</h4>
-          <p class="text-muted">Committed teachers, modern curriculum, and strong student support.</p>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="feature">
-          <h4>Events & Activities</h4>
-          <p class="text-muted">Sports, arts, and community events captured in our news feed.</p>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="feature">
-          <h4>Student Achievements</h4>
-          <p class="text-muted">Celebrate awards and milestones from our students and teams.</p>
-        </div>
-      </div>
+    <div class="mt-4 d-flex justify-content-between">
+      {% if page and page|int > 1 %}
+        <a href="{{ url_for('site.home') }}?page={{ page|int - 1 }}&q={{ q }}" class="btn btn-outline-secondary">← Previous</a>
+      {% else %}
+        <div></div>
+      {% endif %}
+      <a href="{{ url_for('site.home') }}?page={{ (page|int + 1) if page else 2 }}&q={{ q }}" class="btn btn-outline-secondary">Next →</a>
     </div>
   </div>
 </section>
