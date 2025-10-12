@@ -162,7 +162,8 @@ def importArticles(force=False):
                 any_changed = True
             else:
                 skipped += 1
-
+                
+    print(f"Import: {inserted} inserted, {updated} updated, {skipped} skipped.")
     db.commit()
 
     if any_changed:

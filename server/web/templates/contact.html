@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Contact Us | SMAN 2 Cikpus{% endblock %}
+{% block content %}
+<section class="page-section" id="contactUs">
+  <div class="container">
+    <h2>Contact Us</h2>
+    {% if success %}
+      <p style="color:green">Thanks — your message has been received.</p>
+    {% endif %}
+    {% if error %}
+      <p style="color:red">{{ error }}</p>
+    {% endif %}
+
+    <form method="post" style="max-width:720px">
+      <label for="name">Name</label><br>
+      <input id="name" name="name" value="{{ form.name if form is defined }}" style="width:100%;padding:8px;margin-bottom:8px" />
+      <label for="email">Email</label><br>
+      <input id="email" name="email" value="{{ form.email if form is defined }}" style="width:100%;padding:8px;margin-bottom:8px" />
+      <label for="message">Message</label><br>
+      <textarea id="message" name="message" style="width:100%;padding:8px;height:180px">{{ form.message if form is defined }}</textarea>
+      <div style="margin-top:8px">
+        <button class="btn" type="submit">Send Message</button>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

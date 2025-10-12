@@ -1,17 +1,176 @@
 {% extends "base.html" %}
 {% block title %}Control Panel | SMAN 2 Cikpus{% endblock %}
 {% block content %}
-<h2>Welcome {{ user.username }}</h2>
-<p>Role: {{ user.role }}</p>
-
-<nav>
-  <a href="{{ url_for('panel') }}">Dashboard</a> |
-  <a href="{{ url_for('logout') }}">Logout</a>
-</nav>
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h2 class="mb-0">Control Panel</h2>
+    <div class="text-muted">Signed in as <strong>{{ user.username }}</strong> — {{ user.role }}</div>
+  </div>
+  <div>
+    <a class="btn btn-outline-secondary me-2" href="{{ url_for('admin.logout') }}">Logout</a>
+    <button id="btnNewArticle" class="btn btn-primary">New Article</button>
+  </div>
+</div>
 
 <section>
   <h3>Articles Management</h3>
-  <p>You can list, edit, or delete articles here.</p>
-  <!-- Add your article management UI or JS later -->
+  <p>List of articles in the system. Use the actions to edit or delete.</p>
+
+  <table id="articlesTable" class="table table-striped mt-3">
+    <thead>
+      <tr><th>ID</th><th>Title</th><th>Created</th><th>Actions</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 </section>
+
+<!-- New Article Modal (simple) -->
+<div id="newArticleModal" class="modal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Create Article</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">Title</label>
+          <input id="newTitle" class="form-control">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Content (Markdown)</label>
+          <textarea id="newContent" class="form-control" rows="8"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="saveArticleBtn" class="btn btn-primary">Create</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+async function loadArticles(){
+  const res = await fetch('/admin/articles/list');
+  const data = await res.json();
+  const tbody = document.querySelector('#articlesTable tbody');
+  tbody.innerHTML='';
+  for(const a of data){
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${a.id}</td><td>${a.title}</td><td>${a.created}</td><td>
+      <button class="btn btn-sm btn-secondary edit" data-id="${a.id}">Edit</button>
+      <button class="btn btn-sm btn-danger ms-2 del" data-id="${a.id}">Delete</button>
+    </td>`;
+    tbody.appendChild(tr);
+  }
+}
+
+document.getElementById('btnNewArticle').addEventListener('click', ()=>{
+  const modal = new bootstrap.Modal(document.getElementById('newArticleModal'));
+  modal.show();
+});
+
+document.getElementById('saveArticleBtn').addEventListener('click', async ()=>{
+  const title = document.getElementById('newTitle').value.trim();
+  const content = document.getElementById('newContent').value.trim();
+  if(!title || !content) return alert('title and content required');
+  const res = await fetch('/admin/articles/create', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({title, content})});
+  const j = await res.json();
+  if(!res.ok) return alert('error: '+(j.error||JSON.stringify(j)));
+  alert('created');
+  location.reload();
+});
+
+document.addEventListener('click', async (e)=>{
+  if(e.target.classList.contains('del')){
+    if(!confirm('Delete article?')) return;
+    const id = e.target.dataset.id;
+    const r = await fetch('/admin/articles/'+id, {method:'DELETE'});
+    if(r.ok) loadArticles(); else alert('delete failed');
+  }
+});
+
+window.addEventListener('load', loadArticles);
+</script>
+
+{% if user.role == 'admin' %}
+<hr>
+<section>
+  <h3>Users Management</h3>
+  <p>Admins can create editors and manage roles.</p>
+  <div class="row g-3 align-items-end">
+    <div class="col-md-4">
+      <label class="form-label">Username</label>
+      <input id="newUserName" class="form-control">
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Password</label>
+      <input id="newUserPass" class="form-control" type="password">
+    </div>
+    <div class="col-md-2">
+      <label class="form-label">Role</label>
+      <select id="newUserRole" class="form-select">
+        <option value="editor" selected>Editor</option>
+        <option value="admin">Admin</option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <button id="createUserBtn" class="btn btn-outline-primary">Create User</button>
+    </div>
+  </div>
+
+  <table id="usersTable" class="table table-sm table-striped mt-3">
+    <thead><tr><th>ID</th><th>Username</th><th>Role</th><th>Created</th><th>Actions</th></tr></thead>
+    <tbody></tbody>
+  </table>
+</section>
+
+<script>
+async function loadUsers(){
+  const res = await fetch('/admin/users');
+  if(!res.ok) return;
+  const data = await res.json();
+  const tbody = document.querySelector('#usersTable tbody');
+  tbody.innerHTML='';
+  for(const u of data){
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${u.id}</td><td>${u.username}</td><td>${u.role}</td><td>${u.created}</td><td>
+      <select data-username="${u.username}" class="form-select form-select-sm role-select" style="width:140px;display:inline-block">
+        <option value="editor" ${u.role=='editor' ? 'selected' : ''}>Editor</option>
+        <option value="admin" ${u.role=='admin' ? 'selected' : ''}>Admin</option>
+      </select>
+    </td>`;
+    tbody.appendChild(tr);
+  }
+}
+
+document.getElementById('createUserBtn').addEventListener('click', async ()=>{
+  const username = document.getElementById('newUserName').value.trim();
+  const password = document.getElementById('newUserPass').value;
+  const role = document.getElementById('newUserRole').value;
+  if(!username || !password) return alert('username and password required');
+  const res = await fetch('/admin/register', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({username, password, role})});
+  const j = await res.json();
+  if(!res.ok) return alert('error: '+(j.error||JSON.stringify(j)));
+  alert('user created');
+  loadUsers();
+});
+
+document.addEventListener('change', async (e)=>{
+  if(e.target && e.target.classList.contains('role-select')){
+    const username = e.target.dataset.username;
+    const role = e.target.value;
+    const res = await fetch('/admin/users/'+encodeURIComponent(username), {method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({role})});
+    if(!res.ok) return alert('could not update role');
+    alert('role updated');
+    // if changed own role, reload to reflect permissions
+    if(username === '{{ user.username }}') location.reload();
+  }
+});
+
+window.addEventListener('load', loadUsers);
+</script>
+{% endif %}
+
 {% endblock %}

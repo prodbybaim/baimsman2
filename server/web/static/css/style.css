@@ -1,127 +1,54 @@
-:root {
-    --max: 900px;
-    --primary-color: var(--text);
-    --text: #ddd;
-    --dark-text: #aaa;
-    --background: #171717;
+/* Clean, Bootstrap-friendly school theme */
+:root{
+  --brand: #0b5ca8; /* primary school blue */
+  --accent: #f6c85f; /* warm accent */
+  --muted: #6c757d;
 }
 
-body {
-    font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
-    line-height: 1.5;
-    color: var(--text);
-    display: block;
-    margin: 0px;
-    background-color: var(--background);
+body{
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  background: #f7f9fb;
+  color: #212529;
 }
 
-.container {
-    max-width: var(--max);
-    margin: 24px auto;
-    padding: 0 12px;
+.hero{background:linear-gradient(90deg, rgba(11,92,168,0.06), rgba(11,92,168,0.02));padding:28px;border-radius:8px;margin-bottom:20px}
+.hero h1{font-size:2rem;margin-bottom:6px}
+.hero .lead{color:var(--muted)}
+
+/* Carousel */
+.carousel-title a{color:var(--brand);text-decoration:none}
+.carousel-title{font-size:1.5rem;font-weight:600}
+.carousel .carousel-item{padding:28px;border-radius:8px}
+
+/* Features */
+.feature h4{font-weight:600;margin-bottom:8px}
+.feature p{color:var(--muted)}
+
+/* Cards */
+.card{border-radius:8px}
+.card h5 a{color:inherit}
+.card.shadow-sm{box-shadow:0 2px 8px rgba(11,44,77,0.06)}
+
+.btn-primary{background:var(--brand);border-color:var(--brand)}
+.btn-outline-secondary{border-color:#dfe6ef}
+
+.card{border-radius:8px}
+.card .card-body p{margin-bottom:0.6rem}
+
+.meta, .small-muted{color:var(--muted);font-size:0.9rem}
+
+footer{background:#0b2b46;color:#fff}
+footer a{color:#f8f9fa}
+
+.content img{max-width:100%;height:auto}
+
+/* Accessibility helper */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+@media (max-width:768px){
+  .hero{padding:18px}
 }
 
-.pager a{
-    color: var(--text);
-    border-radius: 1px;
-}
-
-.site-header div{
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px;
-    border-bottom: 1px solid --text
-}
-
-.site-header hr{
-    margin-inline: 3%
-}
-
-.brand {
-    font-weight: 700;
-    text-decoration: none;
-    color: inherit;
-    margin-left: 3%;
-}
-
-.search input {
-    color: var(--background);
-    border-radius: 12px;
-    padding: 12px 24px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: text;
-}
-
-.search button {
-    background: var(--background);
-    color: var(--text);
-    border: none;
-    border-radius: 12px;
-    padding: 12px 24px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.articles {
-    list-style: none;
-    padding: 0;
-    margin: 12px 0;
-}
-
-.article-item {
-    padding: 12px 0;
-    border-bottom: 1px dashed --text;
-}
-
-.article-item a {
-    display: block;
-    color: var(--primary-color);
-    text-decoration: none;
-    border: 2px solid;
-    border-radius: 20px;
-    padding: 10px;
-}
-
-.article-item h2 {
-    margin: 0 0 6px 0;
-    font-size: 1.1rem
-}
-
-.meta {
-    color: var(--dark-text);
-    font-size: .85rem;
-    margin-bottom: 8px
-}
-
-.snippet {
-    color: var(--dark-text)
-}
-
-.content img {
-    max-width: 100%;
-    height: auto
-}
-
-.site-footer {
-    text-align: center;
-    padding: 18px 0;
-    color: var(--dark-text);
-    margin-top: 28px
-}
-
-.site-footer a{
-    text-decoration: none;
-    color: var(--dark-text);
-}
-
-.site-footer a:hover {
-    text-decoration: underline;
-}
-
-.site-footer hr {   
-    margin-inline: 3%;
+@media (max-width:576px){
+  .carousel-title{font-size:1.1rem}
 }

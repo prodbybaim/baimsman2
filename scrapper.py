@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 totaldata = 0
 for i in range(5):
     # API URL
-    count = str(random.randint(1,20))
+    count = str(random.randint(1,50))
     url = "https://fakerapi.it/api/v2/texts?_quantity="+count+"&_characters=2048"
     base_dir = "/var/lib/smandacikpus/page/content"
     totaldata = totaldata + int(count)

@@ -1,6 +1,6 @@
-from app import create_app
+from app import create_app as sman2cikpus
 
-app = create_app()
+app = sman2cikpus()
 
 if __name__ == "__main__":
 # change debug/host/port as needed
