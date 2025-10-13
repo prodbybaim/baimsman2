@@ -1,5 +1,5 @@
 import sqlite3
-from flask import g
+from flask import g as flask_g
 from pathlib import Path
 
 class DB:
@@ -8,7 +8,7 @@ class DB:
 
     def connect(self):
         """Per-request connection stored on flask.g"""
-        if not hasattr(g, "_db") or g._db is None:
+        if not hasattr(flask_g, "_db") or flask_g._db is None:
             # detect types helps with DATE/TIMESTAMP if you use them
             conn = sqlite3.connect(self.dbFile, detect_types=sqlite3.PARSE_DECLTYPES, timeout=30)
             conn.row_factory = sqlite3.Row
@@ -16,8 +16,8 @@ class DB:
             conn.execute("PRAGMA foreign_keys = ON")
             conn.execute("PRAGMA journal_mode = WAL")
             conn.execute("PRAGMA synchronous = NORMAL")
-            g._db = conn
-        return g._db
+            flask_g._db = conn
+        return flask_g._db
 
     def get_conn(self):
         """Independent connection not bound to request context (for background tasks)."""
@@ -29,12 +29,12 @@ class DB:
         return conn
 
     def close(self, exception=None):
-        db = getattr(g, "_db", None)
+        db = getattr(flask_g, "_db", None)
         if db is not None:
             try:
                 db.close()
             finally:
-                g._db = None
+                flask_g._db = None
 
     def initDB(self, script=None):
         """Initialize schema from SQL text or path to SQL file."""

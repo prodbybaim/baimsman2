@@ -6,7 +6,7 @@ from datetime import timedelta
 #from routes.api import bp as api_bp
 from routes.site import bp as site_bp
 from errors import register_error_handlers
-from db import DB
+from server.dbutils import DB
 from dbapi import GLOBALSCHEMA
 
 def create_app():

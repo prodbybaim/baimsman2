@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, abort, url_for, Response
 from datetime import datetime
 from dbapi import NewsAPI
-from db import DB
+from server.dbutils import DB
 from config import DB_FILE
 from utils import text_snippet
 
@@ -13,7 +13,7 @@ dbutils = DB(DB_FILE)
 def home():
     page = max(1, int(request.args.get('page', 1)))
     q = request.args.get('q', '').strip()
-    data = pagedb.fetch(offset=(page*10)-10, query=q, limit=10)
+    data = pagedb.preview(offset=(page*10)-10, query=q, limit=10)
     return render_template(
         'index.html',
         articles=data['items'],

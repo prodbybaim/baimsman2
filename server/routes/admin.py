@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, abort, render_template, redirect, url_for, session, current_app
 from articles import importArticles, articleSlug, articlePage
-from db import DB
+from server.dbutils import DB
 from config import DB_FILE, DB_AUTH_FILE, PAGEDIR, ADMIN_REGISTER_TOKEN, SESSION_LIFETIME_DAYS
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta

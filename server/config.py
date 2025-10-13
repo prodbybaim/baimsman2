@@ -6,8 +6,8 @@ ROOT = Path(__file__).parent
 USERDATA = Path("/var/lib/smandacikpus/")
 DB_FILE = USERDATA / "data.db"
 PAGEDIR = USERDATA / "page/content"
-PAGESHOW = 10
-PAGEPREVIEW = 200
+PREVIEWLIMIT = 10
+PREVIEWWORD = 200
 
 
 # Admin registration token -- change this to a strong secret in production.
