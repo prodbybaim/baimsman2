@@ -40,12 +40,16 @@ class DB:
         """Initialize schema from SQL text or path to SQL file."""
         if not script:
             return
-        if isinstance(script, (str,)) and Path(script).exists():
-            script = Path(script).read_text(encoding="utf-8")
+
+        # detect if it's raw SQL text or a file path
+        if isinstance(script, str) and not ("\n" in script or "CREATE TABLE" in script):
+            if Path(script).exists():
+                script = Path(script).read_text(encoding="utf-8")
+
         db = self.connect()
         db.executescript(script)
         db.commit()
-
+        
     def reset(self):
         """Drop all user objects (tables, indexes, triggers, views) except sqlite_*."""
         db = self.connect()

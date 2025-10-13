@@ -38,8 +38,9 @@ CREATE TABLE IF NOT EXISTS teachers (
 
 db = DB(DB_FILE)
 
-class ArticleAPI():
-    def add(self, title: str, creator: str, content: str, type_: str = "article") -> dict:
+class readsAPI():
+    @staticmethod
+    def add(title: str="No Title", creator: str = "admin", content: str= "No Content.", type_: str = "article") -> str:
         now = datetime.now(timezone.utc)
         uid = str(uuidlib.uuid4())
         date_path = now.strftime("%y/%m/%d")
@@ -54,6 +55,8 @@ class ArticleAPI():
             f"date: '{now.strftime('%Y-%m-%d %H:%M:%S')}'\n"
             f"title: {title}\n"
             f"uuid: {uid}\n"
+            f"creator: {creator}\n"
+            f"type: {type_}\n"
             f"---\n\n"
             f"{content.strip()}\n"
         )
@@ -73,12 +76,8 @@ class ArticleAPI():
         connection.commit()
         connection.close()
 
-        return {
-            "uuid": uid,
-            "path": str(fpath),
-            "title": title,
-            "created": now.isoformat(),
-        }
+        print( f"Created new read: {title} ({uid})" )
+        return uid
 
     def fetch(self) -> Any:
         return

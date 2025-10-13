@@ -6,7 +6,7 @@ from datetime import timedelta
 #from routes.api import bp as api_bp
 from routes.site import bp as site_bp
 from errors import register_error_handlers
-from server.dbutils import DB
+from dbutils import DB
 from dbapi import GLOBALSCHEMA
 
 def create_app():
@@ -18,12 +18,13 @@ def create_app():
 
     #app.register_blueprint(admin_bp)
     #app.register_blueprint(api_bp)
-    app.register_blueprint(site_bp)
+    #app.register_blueprint(site_bp)
 
     register_error_handlers(app)
-
-    conn = db.get_conn()
-    conn.executescript(GLOBALSCHEMA)
-    conn.commit()
+    
+    with app.app_context():
+        if not os.path.exists(DB_FILE):
+            db.initDB(script=GLOBALSCHEMA)
+            db.close()
     
     return app

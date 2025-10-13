@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, abort, url_for, Response
 from datetime import datetime
 from dbapi import NewsAPI
-from server.dbutils import DB
+from dbutils import DB
 from config import DB_FILE
 from utils import text_snippet
 
