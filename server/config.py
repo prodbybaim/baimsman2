@@ -4,15 +4,14 @@ from datetime import timezone, timedelta
 
 ROOT = Path(__file__).parent
 USERDATA = Path("/var/lib/smandacikpus/")
-DB_FILE = USERDATA / "articles.db"
-DB_AUTH_FILE = USERDATA / "auth.db"
+DB_FILE = USERDATA / "data.db"
 PAGEDIR = USERDATA / "page/content"
 PAGESHOW = 10
 PAGEPREVIEW = 200
 
 
 # Admin registration token -- change this to a strong secret in production.
-ADMIN_REGISTER_TOKEN = "change-me"
+ADMIN_REGISTER_TOKEN = "sman2cikpus@admin"
 
 # Session lifetime (days) when 'remember me' is checked
 SESSION_LIFETIME_DAYS = 14
