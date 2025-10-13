@@ -4,10 +4,10 @@ import os
 from datetime import timedelta
 #from routes.admin import bp as admin_bp
 #from routes.api import bp as api_bp
-#from routes.site import bp as site_bp
+from routes.site import bp as site_bp
 from errors import register_error_handlers
 from db import DB
-from dbapi import SCHEMA
+from dbapi import GLOBALSCHEMA
 
 def create_app():
     db = DB(DB_FILE)
@@ -18,12 +18,12 @@ def create_app():
 
     #app.register_blueprint(admin_bp)
     #app.register_blueprint(api_bp)
-    #app.register_blueprint(site_bp)
+    app.register_blueprint(site_bp)
 
     register_error_handlers(app)
 
     conn = db.get_conn()
-    conn.executescript(SCHEMA)
+    conn.executescript(GLOBALSCHEMA)
     conn.commit()
     
     return app

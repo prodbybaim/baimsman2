@@ -1,19 +1,19 @@
 from flask import Blueprint, render_template, request, abort, url_for, Response
 from datetime import datetime
-from dbapi import article, BaseAPI
+from dbapi import NewsAPI
+from db import DB
+from config import DB_FILE
 from utils import text_snippet
 
 bp = Blueprint('site', __name__)
-
-# Initialize database (creates all content tables)
-BaseAPI()._ensure_schema()
-
+pagedb = NewsAPI()
+dbutils = DB(DB_FILE)
 
 @bp.route('/')
 def home():
     page = max(1, int(request.args.get('page', 1)))
     q = request.args.get('q', '').strip()
-    data = article.page(page=page, q=q)
+    data = pagedb.fetch(offset=(page*10)-10, query=q, limit=10)
     return render_template(
         'index.html',
         articles=data['items'],
@@ -25,18 +25,17 @@ def home():
 
 @bp.route('/article/<slug>')
 def read(slug):
-    art = article.fetch(slug=slug)
+    art = pagedb.fetch(uuid=slug)
     if not art:
         return abort(404)
     return render_template('article.html', article=art)
 
 
-@bp.route('/contact', methods=['GET', 'POST'])
+"""@bp.route('/contact', methods=['GET', 'POST'])
 def contact():
-    """Simple contact form stored as messages via content_api."""
-    from server.content_api import db
+    Simple contact form stored as messages via content_api.
 
-    db.connect().executescript("""
+    pagedb.connect().executescript(
         CREATE TABLE IF NOT EXISTS messages (
             id INTEGER PRIMARY KEY,
             name TEXT,
@@ -44,7 +43,7 @@ def contact():
             message TEXT,
             created TEXT
         );
-    """)
+    )
 
     if request.method == 'POST':
         name = (request.form.get('name') or '').strip()
@@ -64,13 +63,13 @@ def contact():
         )
         db.connect().commit()
         return render_template('contact.html', success=True)
-    return render_template('contact.html')
+    return render_template('contact.html')"""
 
 
 @bp.route('/sitemap.xml')
 def sitemap():
     """Generate sitemap using articles from content_api."""
-    rows = article.fetch_all()
+    rows = pagedb.fetch_all()
     host = request.host_url.rstrip('/')
     urls = []
     for r in rows:
