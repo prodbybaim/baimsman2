@@ -7,7 +7,12 @@ from config import DB_FILE, PAGEDIR, PREVIEWLIMIT, PREVIEWWORD
 from pathlib import Path
 import uuid as uuidlib
 import sqlite3
+import re
+from flask import g as flask_g
 
+
+
+db: Optional[DB] = None
 # ill edit this file in school
 
 GLOBALSCHEMA = """
@@ -30,26 +35,57 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS teachers (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT,
-    degree TEXT,
     teaching_since TEXT,
     quote TEXT
 );
 """
 
-db = DB(DB_FILE)
+class DButils:
+    @staticmethod
+    def connect():
+        """Per-request connection stored on flask.g"""
+        if not hasattr(flask_g, "_db") or flask_g._db is None:
+            # detect types helps with DATE/TIMESTAMP if you use them
+            conn = sqlite3.connect(DB_FILE, detect_types=sqlite3.PARSE_DECLTYPES, timeout=30)
+            conn.row_factory = sqlite3.Row
+            conn.execute("PRAGMA foreign_keys = ON")
+            conn.execute("PRAGMA journal_mode = WAL")
+            conn.execute("PRAGMA synchronous = NORMAL")
+            flask_g._db = conn
+        return flask_g._db
+
+    @staticmethod
+    def init_db():
+        global db
+        db = DB(DB_FILE)
+        conn = DButils.connect()
+        conn.executescript(GLOBALSCHEMA)
+        conn.commit()
+        conn.close()
+        
+    @staticmethod
+    def get_db() -> DB:
+        if db is None:
+            raise RuntimeError("Database not initialized. Call init_db() first.")
+        return db
+
+
+class DBService:
+    @staticmethod
+    def rebuild() -> bool:
+        return readsAPI.importFromDir()
 
 class readsAPI():
     @staticmethod
     def add(title: str="No Title", creator: str = "admin", content: str= "No Content.", type_: str = "article") -> str:
         now = datetime.now(timezone.utc)
         uid = str(uuidlib.uuid4())
-        date_path = now.strftime("%y/%m/%d")
+        date_path = now.strftime("%yyyy/%m/%d")
         base = Path(PAGEDIR) / date_path
         base.mkdir(parents=True, exist_ok=True)
 
         fpath = base / f"{uid}.md"
 
-        # Markdown front-matter
         md = (
             f"---\n"
             f"date: '{now.strftime('%Y-%m-%d %H:%M:%S')}'\n"
@@ -65,7 +101,8 @@ class readsAPI():
             f.write(md)
 
         preview = text_snippet(content, 180)
-        connection = db.connect()
+        DButils.init_db()
+        connection = DButils.connect()
         connection.execute(
             """
             INSERT INTO reads (uuid, title, creator, created, type, preview, mtime)
@@ -79,6 +116,26 @@ class readsAPI():
         print( f"Created new read: {title} ({uid})" )
         return uid
 
+    def preview(self, slug: str) -> Optional[Dict[str, Any]]:
+        DButils.init_db()
+        connection = DButils.connect()
+        cursor = connection.execute(
+            "SELECT uuid, title, creator, created, type, preview FROM reads WHERE uuid = ?",
+            [slug]
+        )
+        row = cursor.fetchone()
+        connection.close()
+        if row:
+            return {
+                "uuid": row[0],
+                "title": row[1],
+                "creator": row[2],
+                "created": row[3],
+                "type": row[4],
+                "preview": row[5]
+            }
+        return None
+
     def fetch(self) -> Any:
         return
     
@@ -90,6 +147,77 @@ class readsAPI():
 
     def clear_caches(self) -> Any:
         return
+    
+    @staticmethod
+    def importFromDir() -> bool:
+        dirPath = Path(PAGEDIR)
+        if not dirPath.exists():
+            return False
+
+        connection = sqlite3.connect(DB_FILE)
+        connection.row_factory = sqlite3.Row
+
+        # simple front-matter regex
+        fmRegex = re.compile(r"^---\s*(.*?)---\s*(.*)$", re.DOTALL)
+
+        try:
+            for file in dirPath.rglob("*.md"):
+                text = file.read_text(encoding="utf-8")
+                meta = {
+                    "uuid": file.stem,
+                    "title": file.stem,
+                    "creator": "imported",
+                    "type": "article",
+                    "date": datetime.now(timezone.utc).isoformat(),
+                }
+
+                # parse front matter if present
+                m = fmRegex.match(text)
+                if m:
+                    front, body = m.groups()
+                    for line in front.splitlines():
+                        if ":" in line:
+                            k, v = line.split(":", 1)
+                            meta[k.strip()] = v.strip()
+                else:
+                    body = text
+
+                preview = text_snippet(body, 180)
+                now = datetime.now(timezone.utc)
+
+                try:
+                    connection.execute(
+                        """
+                        INSERT OR REPLACE INTO reads
+                        (uuid, title, creator, created, type, preview, mtime)
+                        VALUES (?, ?, ?, ?, ?, ?, ?)
+                        """,
+                        [
+                            meta["uuid"],
+                            meta["title"],
+                            meta["creator"],
+                            meta["date"],
+                            meta["type"],
+                            preview,
+                            now.timestamp(),
+                        ],
+                    )
+                    print(meta)
+                    print(connection.total_changes)
+                except sqlite3.Error as e:
+                    print(f"Failed to import {file.name}: {e}")
+                    continue
+
+            print("Inserted rows:", connection.total_changes)
+            connection.commit()
+        finally:
+            connection.close()
+
+        return True
+
+
+
+        
 
 class NewsAPI():
     def add(self) -> Any:

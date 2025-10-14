@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify, abort, render_template, redirect, url_for, session, current_app
-from articles import importArticles, articleSlug, articlePage
-from server.dbutils import DB
-from config import DB_FILE, DB_AUTH_FILE, PAGEDIR, ADMIN_REGISTER_TOKEN, SESSION_LIFETIME_DAYS
+from dbapi import UserAPI
+from dbutils import DB
+from config import DB_FILE, PAGEDIR, ADMIN_REGISTER_TOKEN, SESSION_LIFETIME_DAYS
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -10,22 +10,7 @@ import os
 
 bp = Blueprint('admin', __name__)
 
-DBPages = DB(DB_FILE)
-DBAuth = DB(DB_AUTH_FILE)
-
-
-def ensure_auth_table():
-    DBAuth.initDB(
-        """
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY,
-            username TEXT UNIQUE,
-            password TEXT,
-            role TEXT,
-            created TEXT
-        );
-        """
-    )
+localDB = DB(DB_FILE)
 
 
 def login_required(fn):
@@ -56,7 +41,7 @@ def require_role(*roles):
             if role is None:
                 # attempt to read role from DB and cache in session
                 try:
-                    db = DBAuth.connect()
+                    db = localDB.connect()
                     row = db.execute('SELECT role FROM users WHERE username = ?', (username,)).fetchone()
                     role = row['role'] if row else None
                     session['admin_role'] = role
