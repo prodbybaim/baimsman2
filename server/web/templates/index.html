@@ -9,17 +9,17 @@
   <div class="container">
     <div class="row align-items-center">
       <div class="col-md-7">
-        <h1 class="mb-2">Welcome to SMAN 2 Cikarang Pusat</h1>
-        <p class="lead">A place of learning, growth, and community. Explore our programs, achievements, and latest news.</p>
+        <h1 class="mb-2">SMAN 2 Cikarang Pusat</h1>
+        <p class="lead">Moving for bright future.</p>
         <p class="mt-3">
-          <a href="#about" class="btn btn-primary me-2">About Us</a>
-          <a href="#programs" class="btn btn-outline-secondary me-2">Our Programs</a>
-          <a href="#teachers" class="btn btn-outline-info me-2">Teachers</a>
-          <a href="#prestasi" class="btn btn-outline-success">Achievements</a>
+          <a href="#about" class="btn btn-primary me-2">Tentang kami</a>
+          <a href="#programs" class="btn btn-secondary me-2">Prestasi</a>
+          <a href="#teachers" class="btn btn-info me-2">Guru</a>
+          <a href="#prestasi" class="btn btn-success me-2">Pencapaian</a>
         </p>
       </div>
       <div class="col-md-5 d-none d-md-block text-center">
-        <img src="{{ url_for('static', filename='images/school-illustration.svg') }}" alt="School" style="max-width:260px;">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="School" style="max-width:260px;">
       </div>
     </div>
   </div>
@@ -30,150 +30,196 @@
   <div class="container">
     <div class="row">
       <div class="col-md-8">
-        <h3>About SMAN 2 Cikarang Pusat</h3>
-        <p class="text-muted">SMAN 2 Cikpus is committed to academic excellence, character building, and preparing students for the future. Our teachers, staff, and students work together to create a safe, inclusive, and stimulating learning environment.</p>
+        <h3>Tentang SMAN 2 Cikarang Pusat</h3>
+        <p class="text-muted">(desc)</p>
       </div>
       <div class="col-md-4">
-        <h5>Quick facts</h5>
-        <ul class="small-muted">
-          <li>Established: 1998</li>
-          <li>Students: ~1,200</li>
+        <h5>Quick Facts</h5>
+        <ul class="small-muted list-unstyled">
+          <li>Berdiri sejak : 1998</span></li>
+          <li>Total siswa: <span class="count" data-target="1098"></span> siswa</li>
           <li>Accreditation: A</li>
         </ul>
-        <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="School Logo" class="img-fluid mt-3" style="max-width:100px;">
       </div>
     </div>
   </div>
 </section>
 
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const counters = document.querySelectorAll(".count");
+
+  const animateCount = (el) => {
+    const target = +el.getAttribute("data-target");
+    const duration = 1500; // ms
+    const stepTime = 20;
+    const steps = duration / stepTime;
+    const increment = target / steps;
+    let count = 0;
+
+    const timer = setInterval(() => {
+      count += increment;
+      if (count >= target) {
+        count = target;
+        clearInterval(timer);
+      }
+      el.textContent = Math.floor(count);
+    }, stepTime);
+  };
+
+  // Start when visible
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        animateCount(entry.target);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.6 });
+
+  counters.forEach(el => observer.observe(el));
+});
+</script>
+
+
 <!-- Programs / Features -->
-<section id="programs" class="py-4 mb-4">
+<section id="programs" class="py-4 mb-4 bg-light">
   <div class="container">
-    <h3 class="mb-3">Our Programs</h3>
-    <div class="row g-3">
-      <div class="col-md-4">
-        <div class="card shadow-sm">
-          <div class="card-body">
-            <h5>Science &amp; Math</h5>
-            <p class="small-muted">Strong STEM curriculum with labs and competitions.</p>
+    <h3 class="mb-3">Program sekolah</h3>
+
+    {% if programs and programs|length > 0 %}
+    <div id="programCarousel" class="carousel slide" data-bs-ride="carousel">
+      <div class="carousel-inner">
+        {% for p in programs %}
+        <div class="carousel-item {% if loop.first %}active{% endif %}">
+          <div class="d-flex justify-content-center">
+            <div class="card shadow-sm" style="width: 18rem;">
+              <div class="card-body text-center">
+                <h5>{{ p.title }}</h5>
+                <p class="small text-muted">{{ p.description }}</p>
+              </div>
+            </div>
           </div>
         </div>
+        {% endfor %}
       </div>
-      <div class="col-md-4">
-        <div class="card shadow-sm">
-          <div class="card-body">
-            <h5>Arts &amp; Culture</h5>
-            <p class="small-muted">Music, visual arts, and traditional cultural activities.</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card shadow-sm">
-          <div class="card-body">
-            <h5>Sports &amp; Clubs</h5>
-            <p class="small-muted">Active student clubs and competitive sports teams.</p>
-          </div>
-        </div>
-      </div>
+
+      <!-- Carousel controls -->
+      <button class="carousel-control-prev" type="button" data-bs-target="#programCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#programCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+      </button>
     </div>
+    {% else %}
+      <p class="text-center text-muted">Program sekolah gagal dimuat.</p>
+    {% endif %}
+
   </div>
 </section>
 
 <!-- Teachers -->
-<section id="teachers" class="py-4 mb-4 bg-light">
+<section id="teachers" class="py-4 mb-4 bg-white">
   <div class="container">
-    <h3 class="mb-3">Our Teachers</h3>
-    <div class="row g-3">
-      <div class="col-md-4">
-        <div class="card shadow-sm text-center">
-          <img src="{{ url_for('static', filename='images/teacher-placeholder.svg') }}" class="card-img-top" alt="Teacher" style="height:200px; object-fit:cover;">
-          <div class="card-body">
-            <h5 class="card-title">Dr. Ahmad Surya</h5>
-            <p class="card-text">Mathematics Teacher</p>
-            <p class="small text-muted">PhD in Mathematics, 15 years experience</p>
+    <h3 class="mb-3">Guru-guru</h3>
+
+    {% if gurus %}
+    <div id="teacherCarousel" class="carousel slide" data-bs-ride="carousel">
+      <div class="carousel-inner">
+        {% for guru in gurus %}
+        <div class="carousel-item {% if loop.first %}active{% endif %}">
+          <div class="d-flex justify-content-center">
+            <div class="card shadow-sm text-center" style="width: 18rem;">
+              <img src="{{ url_for('static', filename='images/teacher-placeholder.svg') }}" 
+                   class="card-img-top" alt="Teacher" style="height:200px; object-fit:cover;">
+              <div class="card-body">
+                <h5 class="card-title">{{ guru.name }}</h5>
+                <p class="card-text">{{ guru.subject }}</p>
+                <p class="small text-muted">{{ guru.description }}</p>
+              </div>
+            </div>
           </div>
         </div>
+        {% endfor %}
       </div>
-      <div class="col-md-4">
-        <div class="card shadow-sm text-center">
-          <img src="{{ url_for('static', filename='images/teacher-placeholder.svg') }}" class="card-img-top" alt="Teacher" style="height:200px; object-fit:cover;">
-          <div class="card-body">
-            <h5 class="card-title">Ms. Siti Nurhaliza</h5>
-            <p class="card-text">Science Teacher</p>
-            <p class="small text-muted">MSc in Biology, Passionate about STEM</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card shadow-sm text-center">
-          <img src="{{ url_for('static', filename='images/teacher-placeholder.svg') }}" class="card-img-top" alt="Teacher" style="height:200px; object-fit:cover;">
-          <div class="card-body">
-            <h5 class="card-title">Mr. Budi Santoso</h5>
-            <p class="card-text">English Teacher</p>
-            <p class="small text-muted">Certified ESL Instructor, Loves Literature</p>
-          </div>
-        </div>
-      </div>
+
+      <!-- Carousel controls -->
+      <button class="carousel-control-prev" type="button" data-bs-target="#teacherCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#teacherCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+      </button>
     </div>
+    {% else %}
+      <p class="text-center text-muted">Guru gagal dimuat.</p>
+    {% endif %}
   </div>
 </section>
 
 <!-- Prestasi / Achievements -->
-<section id="prestasi" class="py-4 mb-4">
+<section id="prestasi" class="py-4 mb-4 bg-light">
   <div class="container">
-    <h3 class="mb-3">Prestasi & Achievements</h3>
-    <div class="row g-3">
-      <div class="col-md-4">
-        <div class="card shadow-sm text-center">
-          <div class="card-body">
-            <i class="fas fa-trophy fa-3x text-warning mb-3"></i>
-            <h5 class="card-title">National Science Olympiad</h5>
-            <p class="card-text">Gold Medal Winners 2023</p>
-            <p class="small text-muted">Team of 5 students excelled in physics and chemistry.</p>
+    <h3 class="mb-3">Prestasi</h3>
+
+    {% if prestasi and prestasi|length > 0 %}
+    <div id="prestasiCarousel" class="carousel slide" data-bs-ride="carousel">
+      <div class="carousel-inner">
+        {% for p in prestasi %}
+        <div class="carousel-item {% if loop.first %}active{% endif %}">
+          <div class="d-flex justify-content-center">
+            <div class="card shadow-sm text-center" style="width: 18rem;">
+              <div class="card-body">
+                <i class="{{ p.icon }} fa-3x mb-3" style="color: {{ p.color }}"></i>
+                <h5 class="card-title">{{ p.title }}</h5>
+                <p class="card-text">{{ p.subtitle }}</p>
+                <p class="small text-muted">{{ p.preview }}</p>
+              </div>
+            </div>
           </div>
         </div>
+        {% endfor %}
       </div>
-      <div class="col-md-4">
-        <div class="card shadow-sm text-center">
-          <div class="card-body">
-            <i class="fas fa-medal fa-3x text-success mb-3"></i>
-            <h5 class="card-title">Mathematics Competition</h5>
-            <p class="card-text">1st Place Provincial Level</p>
-            <p class="small text-muted">Outstanding performance in algebra and geometry.</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card shadow-sm text-center">
-          <div class="card-body">
-            <i class="fas fa-award fa-3x text-primary mb-3"></i>
-            <h5 class="card-title">Art Exhibition</h5>
-            <p class="card-text">Best School Award</p>
-            <p class="small text-muted">Creative works showcased nationally.</p>
-          </div>
-        </div>
-      </div>
+
+      <!-- Carousel controls -->
+      <button class="carousel-control-prev" type="button" data-bs-target="#prestasiCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#prestasiCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+      </button>
     </div>
+    {% else %}
+      <p class="text-center text-muted">Prestasi gagal dimuat.</p>
+    {% endif %}
+
   </div>
 </section>
+
+
 
 <!-- Showcase / Latest News -->
 <section id="showcase" class="py-4 mb-4 bg-white">
   <div class="container">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <h3 class="mb-0">Latest News</h3>
-      <small class="text-muted">Page {{ page }}</small>
-    </div>
+    <h3 class="mb-3">Berita</h3>
 
     <div class="row g-3">
-      {% if articles and articles|length > 0 %}
-        {% for a in articles %}
+      {% if news and news|length > 0 %}
+        {% for a in news %}
         <div class="col-md-6">
           <div class="card shadow-sm">
             <div class="card-body">
-              <h5 class="card-title"><a href="{{ url_for('site.read', slug=a.slug) }}">{{ a.title }}</a></h5>
+              <h5 class="card-title">{{ a.title }}</h5>
               <p class="meta">Published: {{ a.created }}</p>
-              <p class="card-text">{{ a.snippet }}</p>
+              <p class="card-text">{{ a.preview }}</p>
+              <!-- Read more directs to /read/<slug> -->
               <a href="{{ url_for('site.read', slug=a.slug) }}" class="btn btn-sm btn-primary">Read more</a>
             </div>
           </div>
@@ -181,70 +227,106 @@
         {% endfor %}
       {% else %}
         <div class="col-12">
-          <p class="text-muted">No news yet. Check back later or contact the school to submit items.</p>
+          <p class="text-muted text-center">Berita gagal dimuat.</p>
         </div>
       {% endif %}
-    </div>
-
-    <div class="mt-4 d-flex justify-content-between">
-      {% if page and page|int > 1 %}
-        <a href="{{ url_for('site.home') }}?page={{ page|int - 1 }}&q={{ q }}" class="btn btn-outline-secondary">← Previous</a>
-      {% else %}
-        <div></div>
-      {% endif %}
-      <a href="{{ url_for('site.home') }}?page={{ (page|int + 1) if page else 2 }}&q={{ q }}" class="btn btn-outline-secondary">Next →</a>
     </div>
   </div>
 </section>
 
-<!-- Latest articles list (cards) -->
+
 <section id="articles" class="mb-5">
   <div class="container">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <h3 class="mb-0">Latest Articles</h3>
-      <small class="text-muted">Page {{ page }}</small>
-    </div>
-
+    <h3 class="mb-3">Artikel</h3>
     <div class="row g-3">
-      {% for a in articles %}
-      <div class="col-md-6">
-        <div class="card h-100 shadow-sm">
-          <div class="card-body">
-            <h5 class="card-title"><a class="stretched-link text-decoration-none" href="{{ url_for('site.read', slug=a.slug) }}">{{ a.title }}</a></h5>
-            <p class="card-text text-muted small mb-2">{{ a.created }}</p>
-            <p class="card-text">{{ a.snippet }}</p>
-          </div>
-          <div class="card-footer bg-transparent border-0">
-            <a href="{{ url_for('site.read', slug=a.slug) }}" class="btn btn-sm btn-primary">Read more</a>
+      {% if articles and articles|length > 0 %}
+        {% for a in articles %}
+        <div class="col-md-6">
+          <div class="card h-100 shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">{{ a.title }}</h5>
+              <p class="card-text text-muted small mb-2">{{ a.created }}</p>
+              <p class="card-text text-muted small mb-2">Oleh {{ a.creator }}</p>
+              <p class="card-text">{{ a.preview }}</p>
+            </div>
+            <div class="card-footer bg-transparent border-0">
+              <!-- Read more directs to /read/<uuid> -->
+              <a href="{{ url_for('site.read', uuid=a.uuid) }}" class="btn btn-sm btn-primary">Read more</a>
+            </div>
           </div>
         </div>
-      </div>
+        {% endfor %}
       {% else %}
-      <div class="col-12"><p>No articles found.</p></div>
-      {% endfor %}
-    </div>
-
-    <div class="mt-4 d-flex justify-content-between">
-      {% if page > 1 %}
-      <a href="{{ url_for('site.home', page=page-1, q=q) }}" class="btn btn-outline-secondary">&larr; Previous</a>
-      {% else %}
-      <div></div>
-      {% endif %}
-
-      {% if total > page * 10 %}
-      <a href="{{ url_for('site.home', page=page+1, q=q) }}" class="btn btn-outline-secondary">Next &rarr;</a>
+        <div class="col-12">
+          <p class="text-muted text-center">Artikel gagal dimuat.</p>
+        </div>
       {% endif %}
     </div>
   </div>
 </section>
+
 
 <!-- CTA / Contact -->
 <section id="cta" class="py-5 bg-white">
-  <div class="container text-center">
-    <h4>Have news or an event to share?</h4>
-    <p class="text-muted">Reach out to the school office or send us a message.</p>
-    <a class="btn btn-lg btn-primary" href="{{ url_for('site.contact') }}">Contact Us</a>
+  <div class="container">
+    <div class="text-center mb-4">
+      <h4>Hubungi Kami</h4>
+      <p class="text-muted">Hubungi staff kami untuk memberikan tanggapan anda.</p>
+    </div>
+
+    <form id="contactForm" method="POST" action="" class="mx-auto" style="max-width: 600px;">
+      <div class="mb-3">
+        <label for="name" class="form-label">Nama Lengkap</label>
+        <input type="text" id="name" name="name" class="form-control" placeholder="Masukkan nama Anda" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="email" class="form-label">Alamat Email</label>
+        <input type="email" id="email" name="email" class="form-control" placeholder="email@email.com" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="phone" class="form-label">Nomor Telepon (opsional)</label>
+        <input type="tel" id="phone" name="phone" class="form-control" placeholder="+62...">
+      </div>
+
+      <div class="mb-3">
+        <label for="message" class="form-label">Pesan</label>
+        <textarea id="message" name="message" class="form-control" rows="4" placeholder="Tulis pesan Anda di sini..." required></textarea>
+      </div>
+
+      <div class="text-center">
+        <button type="submit" class="btn btn-primary btn-lg">Kirim Pesan</button>
+      </div>
+    </form>
   </div>
 </section>
+
+<script>
+// 🧠 Protect from accidental refresh or close when form is not submitted
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("contactForm");
+  let formDirty = false;
+
+  // Detect user typing or modifying any field
+  form.addEventListener("input", () => {
+    formDirty = true;
+  });
+
+  // Remove protection after successful submit
+  form.addEventListener("submit", () => {
+    formDirty = false;
+  });
+
+  // Warn before closing/reloading
+  window.addEventListener("beforeunload", (e) => {
+    if (formDirty) {
+      e.preventDefault();
+    }
+  });
+});
+</script>
+
+
 
 {% endblock %}

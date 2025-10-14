@@ -3,18 +3,19 @@ from datetime import timezone, timedelta
 
 
 ROOT = Path(__file__).parent
-USERDATA = Path("/var/lib/smandacikpus/")
+SCHOOLNICK = "smandacikpus"
+USERDATA = Path("/var/lib/" + SCHOOLNICK + "/")
+TEACHERJSON = USERDATA / "teachers.json"
+LOGINJSON = USERDATA / "login.json"
 DB_FILE = USERDATA / "data.db"
-PAGEDIR = USERDATA / "page/content"
+PAGEDIR = USERDATA / "content"
 PREVIEWLIMIT = 10
 PREVIEWWORD = 200
 
-
-# Admin registration token -- change this to a strong secret in production.
 ADMIN_REGISTER_TOKEN = "sman2cikpus@admin"
 
 # Session lifetime (days) when 'remember me' is checked
-SESSION_LIFETIME_DAYS = 14
+SESSION_LIFETIME_DAYS = 30
 
 
 # timezone placeholder if needed elsewhere
