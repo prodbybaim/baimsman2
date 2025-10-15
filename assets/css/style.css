@@ -1,0 +1,59 @@
+:root{
+  --primary-color: #08414E;
+  --primary-hover: #0A5A6B;
+  --bg: #ffffff;
+  --card: #f6f8fb;
+  --muted: #596580;
+  --text: #0b2b4a;
+  --glass: rgba(11,43,74,0.04);
+}
+.theme.dark{
+  --bg:#0a1a1f; --card:rgba(255,255,255,0.03); --muted:#9aa4b2; --text:#e0f7fa;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; background:var(--bg); color:var(--text);}
+a{color:var(--primary-color);text-decoration:none}
+a:hover{color:var(--primary-hover);}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:var(--card);gap:12px;position:sticky;top:0;z-index:40;box-shadow:0 6px 18px rgba(0,0,0,0.06)}
+.brand{display:flex;gap:12px;align-items:center}
+.logo{width:52px;height:52px;border-radius:10px;background:linear-gradient(135deg,var(--primary-color),#06b6d4);display:flex;align-items:center;justify-content:center;color:white;font-weight:700}
+.school-name{font-weight:700}
+.tagline{font-size:13px;color:var(--muted)}
+.nav{display:flex;gap:10px}
+.nav a{padding:8px 10px;border-radius:8px}
+.right-controls{display:flex;align-items:center;gap:8px}
+.icon-btn{background:transparent;border:1px solid rgba(0,0,0,0.06);padding:8px;border-radius:8px;cursor:pointer}
+.container{max-width:1100px;margin:22px auto;padding:0 16px;width:100%}
+.hero{display:grid;grid-template-columns:1fr 360px;gap:18px;align-items:start}
+.card{background:var(--card);padding:16px;border-radius:12px;box-shadow:0 6px 18px rgba(11,20,40,0.04)}
+.search{display:flex;gap:8px;margin-top:12px}
+.search input{flex:1;padding:10px;border-radius:10px;border:1px solid rgba(0,0,0,0.06);background:transparent}
+.cta{background:var(--primary-color);padding:8px 12px;border-radius:10px;color:#fff;text-decoration:none;font-weight:600;border:none}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:12px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin-top:12px}
+.card h4{margin:6px 0 4px}
+.meta{color:var(--muted);font-size:13px}
+.site-footer{margin-top:24px;padding:18px;text-align:center;color:var(--muted);font-size:14px}
+
+/* header logo + motto */
+.logo-area{display:flex;align-items:center;gap:12px}
+.school-logo{height:64px;width:auto;object-fit:contain}
+.school-motto{height:50px;width:auto;object-fit:contain}
+.school-info{display:flex;flex-direction:column;justify-content:center}
+.school-name{font-size:1.2rem;color:var(--primary-color);margin:0}
+.tagline{margin-top:2px;color:var(--muted);font-style:italic}
+
+/* settings panel */
+.settings-panel{position:fixed;right:18px;top:64px;width:280px;background:var(--card);padding:12px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.15);display:none;z-index:80}
+.settings-panel.open{display:block}
+.switch{display:flex;align-items:center;justify-content:space-between;padding:8px 0}
+.small{font-size:13px;color:var(--muted)}
+
+/* page transition overlay */
+.page-overlay{position:fixed;left:0;top:0;width:100%;height:100%;background:var(--bg);z-index:90;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity .35s ease}
+.page-overlay.show{opacity:1;pointer-events:auto}
+.loader{width:72px;height:72px;border-radius:50%;border:6px solid var(--primary-color);border-left-color:transparent;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* responsive */
+@media(max-width:880px){.hero{grid-template-columns:1fr} .nav{display:none} .school-name{font-size:1rem}}
