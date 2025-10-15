@@ -12,8 +12,7 @@ from flask import g as flask_g
 import hashlib
 from functools import lru_cache
 
-DB = sqlite3.Connection # referencing
-db = None # global init
+db = None
 
 GLOBALSCHEMA = """
 CREATE TABLE IF NOT EXISTS reads (
@@ -61,28 +60,43 @@ class DButils: # complete
 
     @staticmethod
     def init_db():
-        """Global init; one-off script usage"""
-        with sqlite3.connect(DB_FILE) as conn:
-            conn.row_factory = sqlite3.Row
-            conn.executescript(GLOBALSCHEMA)
-            conn.commit()
+        try:
+            with sqlite3.connect(DB_FILE) as conn:
+                conn.row_factory = sqlite3.Row
+                conn.executescript(GLOBALSCHEMA)
+                conn.commit()
+        finally:
+            print("DB Initialized")
         
     @staticmethod
-    def get_db() -> DB:
+    def get_db() -> sqlite3.Connection:
         if db is None:
             raise RuntimeError("Database not initialized. Call init_db() first.")
         return db
 
     @staticmethod
     def syncAll():
-        UserAPI.sync()
-        TeacherAPI.sync()
-        ReadsAPI.importFromDir()
+        steps = [
+            ("Initialize DB...  ", DButils.init_db),
+            ("Sync users...     ", UserAPI.sync),
+            ("Sync teachers...  ", TeacherAPI.sync),
+            ("Import reads...   ", ReadsAPI.importFromDir)]
+        for i, (label, func) in enumerate(steps, 1):
+            print(f"[{i}/{len(steps)}] {label}", end='', flush=True)
+            func()
         print("Synchronized all data sources.")
+        return {"status": "success"}
+
+    @staticmethod
+    def close():
+        db = getattr(flask_g, "_db", None)
+        if db is not None:
+            db.close()
+            flask_g._db = None
 
 class ReadsAPI: # complete
     @staticmethod
-    def add(title: str="No Title", creator: str = "admin", content: str= "No Content.", type_: str = "article") -> str: # complete
+    def add(title: str="No Title", creator: str = "admin", content: str= "No Content.", type_: str = "article") -> str: # unused
         now = datetime.now(timezone.utc)
         uid = str(uuid.uuid4())
         date_path = now.strftime("%Y/%m/%d")
@@ -121,7 +135,7 @@ class ReadsAPI: # complete
         return uid
 
     @staticmethod
-    def preview(slug: str) -> Optional[Dict[str, Any]]: # not complete
+    def preview(slug: str) -> Optional[Dict[str, Any]]: # unused
         DButils.init_db()
         connection = DButils.connect()
         cursor = connection.execute(
@@ -213,6 +227,7 @@ class ReadsAPI: # complete
 
     @staticmethod
     @lru_cache(maxsize=512)
+
     def read(uuid: str) -> Optional[Dict[str, Any]]: # complete
         connection = DButils.connect()
         cursor = connection.execute(
@@ -221,7 +236,7 @@ class ReadsAPI: # complete
         )
         row = cursor.fetchone()
         if row:
-            md_path = Path(PAGEDIR) / datetime.fromisoformat(row['created']).strftime("%Y/%m/%d") / f"{uuid}.md"
+            md_path = Path(PAGEDIR) / datetime.fromisoformat(row['created'].replace("\'","")).strftime("%Y/%m/%d") / f"{uuid}.md"
             if md_path.exists():
                 content = md_path.read_text(encoding="utf-8")
             else:
@@ -230,7 +245,7 @@ class ReadsAPI: # complete
         return None
 
     @staticmethod
-    def clearCache() -> None: # complete
+    def clearCache() -> None: # unused
         if hasattr(ReadsAPI, '_cache'):
             ReadsAPI._cache.clear() # type: ignore
         print("Cache cleared.")
@@ -397,25 +412,11 @@ class UserAPI: # complete
             jsonTime = jData.get("_mtime", 0) if jData else 0
             if not jData or dbTime > jsonTime:
                 allUsersJSON[uid] = {"id": dbData["id"], "username": dbData["username"], "password": dbData["password"], "role": dbData["role"], "_mtime": time.time()}
-
+        
+        print(f"Imported: {conn.total_changes}")
         UserAPI._writeJSON(allUsersJSON)
 
 class TeacherAPI: # complete
-    @staticmethod
-    def _ensure_db() -> None: # complete
-        DB_FILE.parent.mkdir(parents=True, exist_ok=True)
-        conn = sqlite3.connect(DB_FILE)
-        conn.execute(
-            "CREATE TABLE IF NOT EXISTS teachers ("
-            "id TEXT PRIMARY KEY, "
-            "name TEXT, "
-            "subject TEXT, "
-            "bio TEXT, "
-            "role TEXT, "
-            "mtime REAL)"
-        )
-        conn.commit()
-
     @staticmethod
     def _load_json() -> Dict[str, Dict[str, Any]]: # complete
         if not TEACHERJSON.exists():
@@ -444,7 +445,6 @@ class TeacherAPI: # complete
 
     @staticmethod
     def add(name: str, subject: str = "", bio: str = "", role: str = "teacher") -> str: # complete
-        TeacherAPI._ensure_db()
         tid = str(uuid.uuid4())
         mtime = time.time()
         conn = sqlite3.connect(DB_FILE)
@@ -474,7 +474,7 @@ class TeacherAPI: # complete
         if t:
             return t
 
-        TeacherAPI._ensure_db()
+
         conn = sqlite3.connect(DB_FILE)
         cursor = conn.execute(
             "SELECT id, name, subject, bio, role, mtime FROM teachers WHERE id = ?",
@@ -503,7 +503,7 @@ class TeacherAPI: # complete
         if name is None and subject is None and bio is None and role is None:
             return False
 
-        TeacherAPI._ensure_db()
+
         fields = []
         values = []
         if name is not None:
@@ -551,7 +551,7 @@ class TeacherAPI: # complete
 
     @staticmethod
     def delete(teacherId: str) -> bool: # complete
-        TeacherAPI._ensure_db()
+
         conn = sqlite3.connect(DB_FILE)
         cursor = conn.execute("DELETE FROM teachers WHERE id = ?", (teacherId,))
         conn.commit()
@@ -621,7 +621,7 @@ class TeacherAPI: # complete
 
         all_main = TeacherAPI._load_json()
         imported = 0
-        TeacherAPI._ensure_db()
+
         conn = sqlite3.connect(DB_FILE)
         for tid, rec in data.items():
             if not isinstance(rec, dict):
@@ -662,7 +662,7 @@ class TeacherAPI: # complete
 
     @staticmethod
     def sync() -> None: # complete
-        TeacherAPI._ensure_db()
+
         all_json = TeacherAPI._load_json()
 
         conn = sqlite3.connect(DB_FILE)
@@ -709,5 +709,5 @@ class TeacherAPI: # complete
                     "role": row[4],
                     "_mtime": db_mtime if db_mtime > 0 else time.time(),
                 }
-
+        print(f"Imported: {conn.total_changes}")
         TeacherAPI._write_json(all_json)

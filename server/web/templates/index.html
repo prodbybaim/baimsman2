@@ -219,8 +219,8 @@ document.addEventListener("DOMContentLoaded", () => {
               <h5 class="card-title">{{ a.title }}</h5>
               <p class="meta">Published: {{ a.created }}</p>
               <p class="card-text">{{ a.preview }}</p>
-              <!-- Read more directs to /read/<slug> -->
-              <a href="{{ url_for('site.read', slug=a.slug) }}" class="btn btn-sm btn-primary">Read more</a>
+              <!-- Read more directs to /read/<uuid> -->
+              <a href="{{ url_for('site.read', uuid=a.uuid) }}" class="btn btn-sm btn-primary">Read more</a>
             </div>
           </div>
         </div>
@@ -250,8 +250,7 @@ document.addEventListener("DOMContentLoaded", () => {
               <p class="card-text">{{ a.preview }}</p>
             </div>
             <div class="card-footer bg-transparent border-0">
-              <!-- Read more directs to /read/<uuid> -->
-              <a href="{{ url_for('site.read', slug=a.uuid) }}" class="btn btn-sm btn-primary">Read more</a>
+              <a href="{{ url_for('site.read', uuid=a.uuid) }}" class="btn btn-sm btn-primary">Read more</a>
             </div>
           </div>
         </div>
@@ -303,22 +302,18 @@ document.addEventListener("DOMContentLoaded", () => {
 </section>
 
 <script>
-// 🧠 Protect from accidental refresh or close when form is not submitted
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("contactForm");
   let formDirty = false;
 
-  // Detect user typing or modifying any field
   form.addEventListener("input", () => {
     formDirty = true;
   });
 
-  // Remove protection after successful submit
   form.addEventListener("submit", () => {
     formDirty = false;
   });
 
-  // Warn before closing/reloading
   window.addEventListener("beforeunload", (e) => {
     if (formDirty) {
       e.preventDefault();

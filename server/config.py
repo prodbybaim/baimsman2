@@ -3,12 +3,11 @@ from datetime import timezone, timedelta
 
 
 ROOT = Path(__file__).parent
-SCHOOLNICK = "smandacikpus"
-USERDATA = Path("/var/lib/" + SCHOOLNICK + "/")
+USERDATA = Path("/var/lib/smandacikpus/content/")
 TEACHERJSON = USERDATA / "teachers.json"
 LOGINJSON = USERDATA / "login.json"
 DB_FILE = USERDATA / "data.db"
-PAGEDIR = USERDATA / "content"
+PAGEDIR = USERDATA / "pages"
 PREVIEWLIMIT = 10
 PREVIEWWORD = 200
 
