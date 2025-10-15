@@ -1,3 +1,5 @@
-This repo is proprietary, *but its on github*, because github make the sman2cikpus are being connected.
+# SMAN2Cikpus Site v2
 
-no usage, no tutorial, no any, just an app
+Generated package with merged templates, new color theme #08414E, page transitions, and settings panel.
+
+Drop into your repo root and push.

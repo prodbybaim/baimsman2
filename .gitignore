@@ -1,13 +1,3 @@
-# venv
-.venv
-venv
-
-# user's workspace
-*.code-workspace
-
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-
-b-*
+node_modules/
+.env
+cname.txt

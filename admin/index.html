@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>SMA Negeri 2 Cikarang Pusat</title>
+<meta name="description" content="Website resmi SMA Negeri 2 Cikarang Pusat — informasi, berita, dan layanan untuk siswa & orangtua." />
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="theme">
+<header class="topbar">
+  <div class="brand">
+    <div class="logo"><img src="assets/img/logo.png" alt="Logo" style="height:40px;object-fit:contain"></div>
+    <div class="logo-area">
+      <img src="assets/img/logo.png" class="school-logo" alt="Logo">
+      <img src="assets/img/motto.png" class="school-motto" alt="Motto">
+      <div class="school-info">
+        <div class="school-name">SMA Negeri 2 Cikarang Pusat</div>
+        <div class="tagline">Berakhlak · Berprestasi · Berbudaya Lingkungan</div>
+      </div>
+    </div>
+  </div>
+  <nav class="nav">
+    <a href="index.html">Beranda</a>
+    <a href="about.html">Tentang</a>
+    <a href="news.html">Berita</a>
+    <a href="gallery.html">Galeri</a>
+    <a href="achievements.html">Prestasi</a>
+    <a href="contact.html">Kontak</a>
+  </nav>
+  <div class="right-controls">
+    <button id="settingsBtn" class="icon-btn" aria-label="Settings">☰</button>
+  </div>
+</header>
+
+<main class="container">
+  <section class="card">
+    <h2>Admin</h2>
+    <p class="meta">Panel admin demo — client-side JSON export only.</p>
+    <form id="postForm">
+      <input id="title" placeholder="Judul" style="width:100%;padding:8px;margin-bottom:8px"/>
+      <input id="date" placeholder="Tanggal (e.g. 30 Juli 2025)" style="width:100%;padding:8px;margin-bottom:8px"/>
+      <textarea id="excerpt" placeholder="Ringkasan" style="width:100%;padding:8px;margin-bottom:8px"></textarea>
+      <input id="category" placeholder="Kategori" style="width:100%;padding:8px;margin-bottom:8px"/>
+      <div><button class="cta" id="postBtn" type="button">Simpan sebagai news.json</button></div>
+    </form>
+    <div style="margin-top:10px;color:var(--muted)">This demo cannot write to GitHub — it downloads a news.json for manual upload.</div>
+  </section>
+</main>
+<script>
+document.getElementById('postBtn').addEventListener('click', ()=>{
+  const title = document.getElementById('title').value.trim();
+  const date = document.getElementById('date').value.trim();
+  const excerpt = document.getElementById('excerpt').value.trim();
+  const category = document.getElementById('category').value.trim() || 'Berita';
+  if(!title||!date||!excerpt){alert('Lengkapi semua field.');return;}
+  const item = {title,date,excerpt,category,url:'#'};
+  fetch('data/news.json').then(r=>r.json()).then(data=>{ data.unshift(item); const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='news.json'; a.click(); alert('news.json siap di-download.'); }).catch(()=>{ const blob=new Blob([JSON.stringify([item],null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='news.json'; a.click(); });
+});
+</script>
+
+<footer class="site-footer">
+  <div style="display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap">
+    <div>© 2025 SMA Negeri 2 Cikarang Pusat</div>
+    <div class="meta">Alamat sekolah • Telepon: (021) 000000 • Email: info@smandacikpus.sch.id</div>
+  </div>
+</footer>
+<script src="assets/js/main.js"></script>
+</body>
+</html>
