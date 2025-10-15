@@ -1,4 +1,4 @@
-# Baimsman2 Flask-ready package
+# Baimsman2 Flask package
 
 Run locally:
 ```
