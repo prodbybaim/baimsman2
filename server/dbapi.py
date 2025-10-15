@@ -208,6 +208,7 @@ class ReadsAPI: # complete
                 [meta["uuid"], meta["title"], meta["creator"], meta["date"], meta["type"], preview, now.timestamp()],
             )
         connection.commit()
+        print(f"Imported: {connection.total_changes}")
         return True
 
     @staticmethod
