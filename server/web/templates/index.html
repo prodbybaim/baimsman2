@@ -251,7 +251,7 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
             <div class="card-footer bg-transparent border-0">
               <!-- Read more directs to /read/<uuid> -->
-              <a href="{{ url_for('site.read', uuid=a.uuid) }}" class="btn btn-sm btn-primary">Read more</a>
+              <a href="{{ url_for('site.read', slug=a.uuid) }}" class="btn btn-sm btn-primary">Read more</a>
             </div>
           </div>
         </div>
